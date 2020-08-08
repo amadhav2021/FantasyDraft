@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Fantasy Draft</title>
+        <link rel='stylesheet' type='text/css' href='css/styles.css'> 
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap');       
+        </style>
+        <script type='text/javascript' 
+            src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js'>
+        </script>
+        
+        {{!--<div class='top-nav'>--}}
+        {{!--    <a class='active' href='/'>Home</a></li>--}}
+        {{!--</div>--}}
+    </head>
+    <body>
+        <div class='bg-modal'>
+            <div class='modal-content'>
+                <div id='title'>
+                    Welcome to the <span style='color: hsl(158, 100%,  40.8%);'>Fantasy Draft</span>    
+                </div>
+                Please select your name from the list of members
+                <form style='padding-top: 10px;'>
+                    <input type='radio' id='u1' name='userList' value='Pranav' checked="checked">
+                    <label for='u1'>Pranav</label><br>
+                    <input type='radio' id='u2' name='userList' value='Vishal'>
+                    <label for='u2'>Vishal</label><br>
+                    <input type='radio' id='u3' name='userList' value='Ayan'>
+                    <label for='u3'>Ayan</label><br>
+                    <input type='radio' id='u4' name='userList' value='Somu'>
+                    <label for='u4'>Somu</label><br>
+                    <input type='radio' id='u5' name='userList' value='Sathya'>
+                    <label for='u5'>Sathya</label><br>
+                    <input type='radio' id='u6' name='userList' value='Jaatani'>
+                    <label for='u6'>Jaatani</label><br>
+                    <input type='radio' id='u7' name='userList' value='Ajay'>
+                    <label for='u7'>Ajay</label><br>
+                    <input type='radio' id='u8' name='userList' value='Arjun'>
+                    <label for='u8'>Arjun</label><br>
+                    <input type='radio' id='u9' name='userList' value='Sabareesh'>
+                    <label for='u9'>Sabareesh</label><br>
+                    <input type='radio' id='u10' name='userList' value='Rohan'>
+                    <label for='u10'>Rohan</label><br>
+                    <input type='radio' id='u11' name='userList' value='Amish'>
+                    <label for='u11'>Amish</label><br>
+                    <input type='radio' id='u12' name='userList' value='Aarya'>
+                    <label for='u12'>Aarya</label><br>
+                </form>
+                
+                <button type='button' id='submitUsername' onclick="usernameSubmit()">Submit</button>
+            </div>
+        </div>
+        
+        <div class='draftmodal-bg'>
+            <div class='drafthistorywrapper'>
+                <p>Draft History</p>
+                <ul id='drafthistory'>
+                    {{#each history}}
+                        <li><span style='color: black;'>{{this.pick}}</span></li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div id='close' onclick="closeHistory()">+</div>
+        </div>
+        
+        <div id='tradeBlock' class='trade'>
+            <p class='center' style='font-weight: 400; font-size: 14px;'>Trade Picks</p>
+            <input type='text' placeholder="First User"id='user1' style='width:50%;'>
+            <input type='number' placeholder="Pick 1" id='1user1' style='width:15%;'>
+            <input type='number' placeholder="Pick 2" id='2user1' style='width:15%;'>
+            <input type='number' placeholder="Pick 3" id='3user1' style='width:15%;'>
+            <input type='text' placeholder="Second User"id='user2' style='width:50%;'>
+            <input type='number' placeholder="Pick 1" id='1user2' style='width:15%;'>
+            <input type='number' placeholder="Pick 2" id='2user2' style='width:15%;'>
+            <input type='number' placeholder="Pick 3" id='3user2' style='width:15%;'>
+            <input type='number' placeholder="Password" id='pass' style='width: 30%; margin-top: 5px;'>
+            <button type='button' id='tradeSubmit' onclick='tradeRequest()'>
+                Send Trade Request
+            </button>
+        </div>
+        
+        {{!--<div class='title'>--}}
+        {{!--    <p>Welcome to the <span style="color: #2A7D11">Fantasy Draft</span></p>--}}
+        {{!--</div>--}}
+        
+        <div class='picksWrapper'>
+            <p class='center' style='font-weight: 400; font-size: 14px;'>Draft Order</p>
+            <div id='picksList'>
+                {{#each draft_order}}
+                    {{#if this.rnd}}
+                        <a style='background-color: #ddd;'>{{this.value}}</a>
+                    {{else}}
+                        <a>Pick {{this.num}}: {{this.value}}</a>
+                    {{/if}}
+                {{/each}}
+            </div>
+        </div>
+        
+        <button type='button' id='drafthistorybtn' onclick='openHistory()'>View Draft History</button>
+        <p id='timer' class='center'>-----</p>
+        
+        <input type="text" id="myInput" onkeyup="search()" placeholder="Search player...">
+        
+        <table id='myTeam'>
+            <tr class='header'>
+               <th style='width:15%;'></th> 
+               <th style='width:60%;'>Name</th>
+               <th style='width:20%;'>Bye</th>
+            </tr>
+            {{#each positions}}
+            <tr>
+                <td style='background-color: {{this.color}};'>{{this.name}}</td>
+                <td id='name'>---</td>
+                <td id='bye'>---</td>
+            </tr>
+            {{/each}}
+        </table>
+        
+        <div class='tableWrapper'>
+            <table id="myTable">
+              <tr class="header">
+                <th style="width:30%;">Name</th>
+                <th style="width:10%;">Team</th>
+                <th style="width:12%;">Pos</th>
+                <th style="width:12%;">Games</th>
+                <th style="width:12%;">Avg</th>
+                <th style="width:12%;">Bye</th>
+                <th style="width:"></th>
+              </tr>
+              {{#each info}}
+                  <tr>
+                      <td>{{this.name}}</td>
+                      <td>{{this.team}}</td>
+                      <td>{{this.pos}}</td>
+                      <td>{{this.games}}</td>
+                      <td>{{this.avg}}</td>
+                      <td>{{this.bye}}</td>
+                      <td>
+                          <button class='draft-button' type='button' id="{{this.name}},{{this.bye}},{{this.pos}}" onclick="draft(this)" disabled>
+                              <img src='https://cdn3.iconfinder.com/data/icons/web-and-internet-icons/512/Lock-512.png' width='20', height='20'>
+                          </button>
+                      </td>
+                  </tr>
+              {{/each}}
+            </table>
+        </div>
+        <script type="text/javascript" src="js/fantasy.js"></script>
+</body>
+    
+</html>

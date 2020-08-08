@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+    <head>
+        <script type='text/javascript' 
+            src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js'>
+        </script>
+        <script>
+            var client_socket = io.connect('https://fantasy.sites.tjhsst.edu/', {path: '/socket.io/'})
+            client_socket.emit('client_event', {'first': true})
+            client_socket.on('server_event', function(server_event_msg){
+        
+                p = document.getElementById('response')
+                p.innerHTML = server_event_msg.server_key
+                
+            })
+        </script>
+    </head>
+    
+    <body id='body'>
+        <input type='number' id='number_input'>
+        <button type='button' onclick='doSocket()'>Submit</button>
+        <p id='response'></p>
+
+        <script type='text/javascript'>
+            function doSocket(){
+                var num = document.getElementById('number_input').value;
+                client_socket.emit('client_event', {'number': num, 'extra': 3})
+            }
+        </script>
+    </body>
+</html>
